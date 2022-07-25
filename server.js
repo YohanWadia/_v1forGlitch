@@ -28,10 +28,12 @@ io.on("connection", function (socket) {
     myOwnRoom = data; //used incase of sudden disconnection
     console.log("postROOMJoined: " + myOwnRoom);
     
+    if(roomArr[data]!=undefined){//cz a reconnect will appear here and throw error
     if(roomArr[data].count==4){
       roomArr[data].toBsent=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
       io.in(data).emit("RoomJoining", "Go");   
       console.log("GO GO GO");      
+    }
     }
   });
   
@@ -42,7 +44,7 @@ io.on("connection", function (socket) {
     socket.to(data[3]).emit("myMoves", data); //data[3]will always be roomNo
     
     if (data[0] === 999) {//only for regular victory reset will happen from here. BUT not for sudden disconnection... cz in that case 999 wont be received here
-      if(roomArr[myOwnRoom]!=undefined){  
+      if(roomArr[data[3]]!=undefined){  
         delete roomArr[data[3]];         
         console.log("reset from 999");
       }
@@ -54,39 +56,42 @@ io.on("connection", function (socket) {
   socket.on("myMoves2x2", function (data) {
     console.log("Received: " + data); //[plyNum,what,move,taken,room]... data[4] will always be the room#
 
-    var start = data[0] * 3;
-    roomArr[data[4]].toBsent[start] = data[1];
-    roomArr[data[4]].toBsent[start + 1] = data[2];
-    roomArr[data[4]].toBsent[start + 2] = data[3];
-    var toBsentTemp = roomArr[data[4]].toBsent;
+    if(roomArr[data[4]]!=undefined){ 
     
-    console.log("SettingUp >>  " + toBsentTemp);   
-    
+      var start = data[0] * 3;
+      roomArr[data[4]].toBsent[start] = data[1];
+      roomArr[data[4]].toBsent[start + 1] = data[2];
+      roomArr[data[4]].toBsent[start + 2] = data[3];
+      var toBsentTemp = roomArr[data[4]].toBsent;
 
-    if (!toBsentTemp.includes(-1)) { //only if all the -1 dont exist ... that means all players moves are filled in
-      io.in(data[4]).emit("myMoves2x2", toBsentTemp); //everyone in room including sender
-      console.log("---------sent to ALL: " + toBsentTemp);   
-      
-      //How to reset the my2dArr[room#] thats keeping track of the moves for the next set of moves to be filled in
-      //1.if game is going on normally with no deaths OR the game is fully ended... for both cases reinitialise the my2dArr 
-      //2.if there may be a few finishes but the game still hasnt ended, then we cant make those deaths into -1 cz you will lose their information
-      let finishes = toBsentTemp.filter(x => x === 999).length;          
-      if(!toBsentTemp.includes(999)){ roomArr[data[4]].toBsent = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];}//regular reset
-      else if( finishes===3 ||  (toBsentTemp[0]===999 && toBsentTemp[3]===999) || (toBsentTemp[6]===999 && toBsentTemp[9]===999) ){
-       //if not a single 999(finish)is there(means game is on) ...OR... (3 finishes... OR ...2 finishes of the same team)... means game is over  
-        delete roomArr[data[4]];//resetted room variable
-      }                
-      else{
-          //but if 999 is there & the Game hasnt ended.. dont disturb those 3vals.. and put -1 for the others
-          for(var i =0; i<12; i++ ){
-            if(toBsentTemp[i]===999){i+=2;}//dont touch (this value & next 2 vals) of this finished player
-            else{toBsentTemp[i] = -1;}   //any other that isnt 999(& its 2 other vals) must be reset to -1
-          }
-        roomArr[data[4]].toBsent = toBsentTemp;//special reset taken place
+      console.log("SettingUp >>  " + toBsentTemp);   
+
+
+      if (!toBsentTemp.includes(-1)) { //only if all the -1 dont exist ... that means all players moves are filled in
+        io.in(data[4]).emit("myMoves2x2", toBsentTemp); //everyone in room including sender
+        console.log("---------sent to ALL: " + toBsentTemp);   
+
+        //How to reset the my2dArr[room#] thats keeping track of the moves for the next set of moves to be filled in
+        //1.if game is going on normally with no deaths OR the game is fully ended... for both cases reinitialise the my2dArr 
+        //2.if there may be a few finishes but the game still hasnt ended, then we cant make those deaths into -1 cz you will lose their information
+        let finishes = toBsentTemp.filter(x => x === 999).length;          
+        if(!toBsentTemp.includes(999)){ roomArr[data[4]].toBsent = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];}//regular reset
+        else if( finishes===3 ||  (toBsentTemp[0]===999 && toBsentTemp[3]===999) || (toBsentTemp[6]===999 && toBsentTemp[9]===999) ){
+         //if not a single 999(finish)is there(means game is on) ...OR... (3 finishes... OR ...2 finishes of the same team)... means game is over  
+          delete roomArr[data[4]];//resetted room variable
+        }                
+        else{
+            //but if 999 is there & the Game hasnt ended.. dont disturb those 3vals.. and put -1 for the others
+            for(var i =0; i<12; i++ ){
+              if(toBsentTemp[i]===999){i+=2;}//dont touch (this value & next 2 vals) of this finished player
+              else{toBsentTemp[i] = -1;}   //any other that isnt 999(& its 2 other vals) must be reset to -1
+            }
+          roomArr[data[4]].toBsent = toBsentTemp;//special reset taken place
+        }
+
+      console.log("resetted toBsent: " + toBsentTemp);      
       }
-      
-    console.log("resetted toBsent: " + toBsentTemp);      
-    }      
+    }//only if its not undefined
   });
 
   
@@ -95,7 +100,7 @@ io.on("connection", function (socket) {
   socket.on("Cheater1x1", function (data) {//here you can do a reset cz... the other player will never be needed to reply
     console.log("From Cheater1x1... " + data); 
     socket.to(data[3]).emit("myMoves", data);
-    delete roomArr[data[3]];
+    if(roomArr[data[3]]!=undefined){   delete roomArr[data[3]]; }//very rare but just doing this to avoid a crash
     console.log("reset from Cheater1x1");
   });
 
@@ -104,10 +109,12 @@ io.on("connection", function (socket) {
   socket.on("Cheater2x2", function (data) {
     console.log("From Cheater... " + data); 
 
-    var start = data[0];//this is already the plyNum*3.. so server doesnt need to do calculations to find the position in toBeSent
-    roomArr[myOwnRoom].toBsent[start] = 999;//bcz he cheated
-    roomArr[myOwnRoom].toBsent[start + 1] = data[1];
-    roomArr[myOwnRoom].toBsent[start + 2] = data[2];
+    if(roomArr[data[3]]!=undefined){ //very rare but just doing this to avoid a crash
+      var start = data[0];//this is already the plyNum*3.. so server doesnt need to do calculations to find the position in toBeSent
+      roomArr[myOwnRoom].toBsent[start] = 999;//bcz he cheated
+      roomArr[myOwnRoom].toBsent[start + 1] = data[1];
+      roomArr[myOwnRoom].toBsent[start + 2] = data[2];
+    }
     
     //Now toBsent will never have -1,-1,-1 at the position of the player who discnnted, hence it will never wait
     console.log("toBsent reset from Cheater: " + roomArr[myOwnRoom].toBsent);//for that players moves..& send the moves to everyone
@@ -130,7 +137,8 @@ app.get("/auth", (request, response) => {
   const para3 = parseInt(request.query.gm, 10); //1for 1x1... 2 for 2x2
 
   response.setHeader("Content-Type", "application/json");
-
+  
+  if(roomArr[para1]!=undefined){
   if (roomArr[para1].pk === para2) {//authPassed!
     roomArr[para1].count++;
     let cnt = roomArr[para1].count;
@@ -150,7 +158,8 @@ app.get("/auth", (request, response) => {
       } //-1 means nothing
     }
     
-  } else { //authFAILED
+  }} 
+  else { //authFAILED
     response.send(JSON.stringify({ message: "Access Denied" }));
   }
     
@@ -172,4 +181,3 @@ app.get("/create", (request, response) => {
 
   response.send(JSON.stringify({ message: "Created", room: myCounter, pk: k }));
 });
-
