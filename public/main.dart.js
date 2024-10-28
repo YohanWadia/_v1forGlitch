@@ -80434,7 +80434,7 @@ aj(){return new A.SN(new A.mR(B.cN,$.av()),B.i)}}
 A.SN.prototype={
 a_o(){var s=null,r=this.e
 if(r>0)return A.dX("Rating: "+r,s,s,s,B.Rk,s,s)
-else if(r===0)return B.SC
+else if(r===0)return B.SB
 else return B.Nt},
 u7(){var s=0,r=A.I(t.S),q,p=this,o,n,m,l,k,j,i
 var $async$u7=A.J(function(a,b){if(a===1)return A.F(b,r)
@@ -87518,9 +87518,9 @@ B.VD=new A.jD(4,"remove")
 B.xh=new A.jD(5,"timeout")
 B.NI=new A.tN(null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.e5=new A.m(!0,null,null,null,null,null,24,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.SB=new A.hF("FAILED to create a Room. Please try again.",null,B.e5,null,null,null,null,null,null)
+B.SC=new A.hF("FAILED to create a Room. Please try again.",null,B.e5,null,null,null,null,null,null)
 B.dl=new A.aV(4e6)
-B.NJ=new A.iB(B.SB,null,null,null,null,null,null,null,null,null,null,null,null,B.dl,null,null,null,B.a1,null)
+B.NJ=new A.iB(B.SC,null,null,null,null,null,null,null,null,null,null,null,null,B.dl,null,null,null,B.a1,null)
 B.SG=new A.hF("ERROR: Select Player & Color",null,B.e5,null,null,null,null,null,null)
 B.xi=new A.iB(B.SG,null,null,null,null,null,null,null,null,null,null,null,null,B.dl,null,null,null,B.a1,null)
 B.SD=new A.hF("Room & PassKey copied to clipboard! Going to Game.....",null,B.e5,null,null,null,null,null,null)
@@ -87893,7 +87893,7 @@ B.RJ=new A.m(!0,B.k,null,"Roboto",null,null,null,null,null,null,null,null,null,n
 B.RB=new A.m(!0,B.k,null,"Roboto",null,null,null,null,null,null,null,null,null,null,null,null,null,B.e,null,null,null,"whiteMountainView labelMedium",null,null,null,null)
 B.Ra=new A.m(!0,B.k,null,"Roboto",null,null,null,null,null,null,null,null,null,null,null,null,null,B.e,null,null,null,"whiteMountainView labelSmall",null,null,null,null)
 B.SA=new A.dk(B.QU,B.Sd,B.RT,B.Po,B.RM,B.QO,B.Si,B.PY,B.Qr,B.RF,B.Pf,B.RV,B.RJ,B.RB,B.Ra)
-B.SC=new A.hF("Rating: # # # #",null,null,null,null,null,null,null,null)
+B.SB=new A.hF("Rating: - - - -",null,null,null,null,null,null,null,null)
 B.SI=new A.Bf(null)
 B.SJ=new A.Bg(null)
 B.VF=new A.aer(0,"system")
