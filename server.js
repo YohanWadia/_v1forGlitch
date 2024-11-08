@@ -11,7 +11,10 @@ var roomArr=[];
 
 app.use(express.static("public"));
 
-const server = app.listen(process.env.PORT, () => {
+//const server = app.listen(process.env.PORT, () => {//this is only for glitch
+//below is Hostinger code that is live
+const myPort=3000;
+const server = app.listen(myPort, () => {
   console.log("Your app is listening on port " + server.address().port);  
 });
 
